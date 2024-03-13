@@ -1,19 +1,45 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"os/exec"
 )
 
+func checkSecondaryArgs(args []string) int {
+	for i, arg := range args {
+		if arg == "--" {
+			return i
+		}
+	}
+	return -1
+}
+
+func checkBin(args []string) string {
+	for i, arg := range args {
+		if arg == "--bin" {
+			if i+1 < len(args) {
+				return args[i+1]
+			}
+		}
+	}
+	return ""
+}
+
 func main() {
 	args := os.Args[1:]
-	bin := flag.String("bin", "", "Binary to run")
-	flag.Parse()
+	var secondaryArgs []string
+	if len(args) > 0 {
+		index := checkSecondaryArgs(args)
+		if index != -1 {
+			secondaryArgs = args[index+1:]
+			args = args[:index]
+		}
+	}
+	bin := checkBin(args)
 	// check if main.go exists
 	if _, err := os.Stat("main.go"); !os.IsNotExist(err) {
-		run([]string{"go", "run", "main.go"}, args...)
+		run([]string{"go", "run", "main.go"}, secondaryArgs...)
 	} else {
 		// look for cmd directory
 		if _, err := os.Stat("cmd"); !os.IsNotExist(err) {
@@ -34,21 +60,21 @@ func main() {
 				return
 			}
 			if len(binaries) == 1 {
-				run([]string{"go", "run", fmt.Sprintf("cmd/%s/main.go", binaries[0])}, args...)
+				run([]string{"go", "run", fmt.Sprintf("cmd/%s/main.go", binaries[0])}, secondaryArgs...)
 				return
 			}
 			switch len(binaries) {
 			case 0:
 				fmt.Println("No binaries found in cmd directory")
 			case 1:
-				run([]string{"go", "run", fmt.Sprintf("cmd/%s/main.go", binaries[0])}, args...)
+				run([]string{"go", "run", fmt.Sprintf("cmd/%s/main.go", binaries[0])}, secondaryArgs...)
 			default:
-				if *bin != "" {
+				if bin != "" {
 					found := false
 					for _, binary := range binaries {
-						if binary == *bin {
+						if binary == bin {
 							found = true
-							run([]string{"go", "run", fmt.Sprintf("cmd/%s/main.go", binary)}, args...)
+							run([]string{"go", "run", fmt.Sprintf("cmd/%s/main.go", binary)}, secondaryArgs...)
 							break
 						}
 					}
