@@ -39,7 +39,7 @@ func main() {
 	bin := checkBin(args)
 	// check if main.go exists
 	if _, err := os.Stat("main.go"); !os.IsNotExist(err) {
-		run([]string{"go", "run", "main.go"}, secondaryArgs...)
+		run([]string{"go", "run", "."}, secondaryArgs...)
 	} else {
 		// look for cmd directory
 		if _, err := os.Stat("cmd"); !os.IsNotExist(err) {
@@ -55,26 +55,20 @@ func main() {
 					binaries = append(binaries, file.Name())
 				}
 			}
-			if len(binaries) == 0 {
-				fmt.Println("No binaries found in cmd directory")
-				return
-			}
-			if len(binaries) == 1 {
-				run([]string{"go", "run", fmt.Sprintf("cmd/%s/main.go", binaries[0])}, secondaryArgs...)
-				return
-			}
 			switch len(binaries) {
 			case 0:
 				fmt.Println("No binaries found in cmd directory")
+				return
 			case 1:
-				run([]string{"go", "run", fmt.Sprintf("cmd/%s/main.go", binaries[0])}, secondaryArgs...)
+				run([]string{"go", "run", fmt.Sprintf("cmd/%s/", binaries[0])}, secondaryArgs...)
+				return
 			default:
 				if bin != "" {
 					found := false
 					for _, binary := range binaries {
 						if binary == bin {
 							found = true
-							run([]string{"go", "run", fmt.Sprintf("cmd/%s/main.go", binary)}, secondaryArgs...)
+							run([]string{"go", "run", fmt.Sprintf("cmd/%s/", binary)}, secondaryArgs...)
 							break
 						}
 					}
