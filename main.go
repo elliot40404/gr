@@ -37,6 +37,10 @@ func main() {
 		}
 	}
 	bin := checkBin(args)
+	// if args do not exist secondaryArgs = Args
+	if len(secondaryArgs) == 0 {
+		secondaryArgs = args
+	}
 	// check if main.go exists
 	if _, err := os.Stat("main.go"); !os.IsNotExist(err) {
 		run([]string{"go", "run", "."}, secondaryArgs...)
