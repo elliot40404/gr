@@ -64,7 +64,7 @@ func main() {
 				fmt.Println("No binaries found in cmd directory")
 				return
 			case 1:
-				run([]string{"go", "run", fmt.Sprintf("cmd/%s/", binaries[0])}, secondaryArgs...)
+				run([]string{"go", "run", fmt.Sprintf("./cmd/%s/", binaries[0])}, secondaryArgs...)
 				return
 			default:
 				if bin != "" {
@@ -72,7 +72,7 @@ func main() {
 					for _, binary := range binaries {
 						if binary == bin {
 							found = true
-							run([]string{"go", "run", fmt.Sprintf("cmd/%s/", binary)}, secondaryArgs...)
+							run([]string{"go", "run", fmt.Sprintf("./cmd/%s/", binary)}, secondaryArgs...)
 							break
 						}
 					}
